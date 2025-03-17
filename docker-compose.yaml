@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+  server:
+    container_name: server
+    build:
+      context: .
+      args:
+        - MODE=local
+      dockerfile: Dockerfile
+    ports:
+      - "8086:8086"
+    restart: always
+    depends_on:
+      - server-db
+    networks:
+      - bet-overlord-service_net
+      - rng-service_net
+      - net
+  server-db:
+    container_name: server-db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
+  bet-overlord-service_net:
+    external: true
+  rng-service_net:
+    external: true

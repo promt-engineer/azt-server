@@ -1,0 +1,64 @@
+engine:
+  rtp: 94
+
+server:
+  host: 0.0.0.0
+  port: 8086
+  readTimeout: 30s
+  writeTimeout: 30s
+  maxProcessingTime: 10000ms
+
+websocket:
+  maxProcessingTime: 10000ms
+
+overlord:
+  host: 0.0.0.0
+  port: 7001
+  isSecure: false
+
+history:
+  host: 0.0.0.0
+  port: 7500
+  isSecure: false
+
+rng:
+  host: 0.0.0.0
+  port: 7010
+  maxProcessingTime: 10000ms
+
+queue:
+  exchangeName: internal
+  publishers:
+    backoffice:
+      queueName: backoffice
+  host:
+    name: main
+    host: 0.0.0.0
+    port: 5672
+    username: user
+    password: 12345
+  options:
+    retryTimes: 5
+    backOffSeconds: 2
+
+database:
+  host: 0.0.0.0
+  port: 5432
+  name: aztec-pyramids
+  user: postgres
+  pass: 12345
+  connectionTimeout: 30s
+  compression: zlib
+  pingInterval: 30s
+  minConnections: 10
+  maxConnections: 20
+
+tracer:
+  url: http://localhost:14268/api/traces
+  serviceName: aztec-pyramids
+
+game:
+  availableGames:
+    - aztec-pyramids
+  availableIntegrators:
+    - mock

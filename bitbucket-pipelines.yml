@@ -1,0 +1,37 @@
+image: atlassian/default-image:3
+
+definitions:
+  steps:
+    - step: &init-env-variables
+        name: Init env variables
+        script:
+          # init env variables
+          - export SLOT_NAME="aztec-pyramids"
+          - export TAG=$BITBUCKET_TAG
+          - export CONTAINER_REGISTRY=rg.fr-par.scw.cloud/gamehub
+          - export IMAGE=$CONTAINER_REGISTRY/$SLOT_NAME-server:$TAG
+          # writing variables into build.env
+          - echo export TAG=$TAG >> build.env
+          - echo export CONTAINER_REGISTRY=$CONTAINER_REGISTRY >> build.env
+          - echo export IMAGE=$IMAGE >> build.env
+        artifacts:
+          - build.env
+    - step: &build-and-push-prod
+        name: Build and push image to Scaleway registry
+        services:
+          - docker
+        script:
+          - export TAG=${BITBUCKET_TAG:-18peaches}
+          - export IMAGE=rg.fr-par.scw.cloud/18peaches-3/aztec-pyramids-server:$TAG
+          - docker login rg.fr-par.scw.cloud/18peaches-3 -u nologin -p $SCW_SECRET_TOKEN_PROD
+          - docker build --build-arg TAG=$TAG --build-arg SSH_KEY="`cat /opt/atlassian/pipelines/agent/data/id_rsa`" -t $IMAGE -f Dockerfile .
+          - docker push $IMAGE
+
+pipelines:
+  tags:
+    '*.*.*':
+      - step: *init-env-variables
+      - step: *build-and-push-prod
+  branches:
+    '18peaches':
+      - step: *build-and-push-prod
